@@ -1,0 +1,33 @@
+/* style.css */
+
+#chat-container {
+    width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#messages {
+    height: 200px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#message-input {
+    width: 70%;
+    padding: 5px;
+}
+
+#send-button {
+    width: 25%;
+    padding: 5px;
+}
+
+.message-translation {
+    color: gray;
+    font-size: 12px;
+    margin-top: 5px;
+}

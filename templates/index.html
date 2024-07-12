@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DataMinds Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <input id="message-input" type="text" placeholder="Type a message...">
+        <button id="send-button">Send</button>
+        <button id="translate-button">Translate to Hindi</button>
+        <button id="toggle-voice">Start Recording</button> <!-- New button for voice messaging -->
+        <div id="translated-messages"></div>
+    </div>
+    <audio id="audio-player" controls style="display: none;"></audio> <!-- Hidden audio player -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        const socket = io();
+        const toggleVoiceButton = document.getElementById('toggle-voice');
+        let isRecording = false;
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        toggleVoiceButton.onclick = function() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        };
+
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = handleDataAvailable;
+                    mediaRecorder.start();
+                    toggleVoiceButton.textContent = 'Stop Recording';
+                    isRecording = true;
+                })
+                .catch(error => console.error('Error accessing microphone:', error));
+        }
+
+        function handleDataAvailable(event) {
+            if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+            }
+        }
+
+        function stopRecording() {
+            mediaRecorder.stop();
+            toggleVoiceButton.textContent = 'Start Recording';
+            isRecording = false;
+
+            const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            sendVoiceMessage(audioUrl);
+            recordedChunks = [];
+        }
+
+        
+        function sendVoiceMessage(audioUrl) {
+            const audioElement = document.createElement('audio');
+            audioElement.src = audioUrl;
+            audioElement.controls = true;
+            const messageContainer = document.getElementById('messages');
+            messageContainer.appendChild(audioElement);
+
+            // Send voice message to server (optional)
+            // socket.send(audioUrl);
+        }
+    </script>
+</body>
+</html>
