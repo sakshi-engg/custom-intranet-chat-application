@@ -1,33 +1,85 @@
-/* style.css */
+/* Apply global styles */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: #f0f2f5; /* Facebook-like background color */
+    font-family: Arial, sans-serif;
+}
 
+/* Style the chat container */
 #chat-container {
-    width: 300px;
+    width: 100%;
+    max-width: 400px;
     margin: 0 auto;
     padding: 20px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px;
+    background: white;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
+/* Style the messages container */
 #messages {
-    height: 200px;
+    height: 300px;
     overflow-y: scroll;
     border: 1px solid #ccc;
     padding: 10px;
     margin-bottom: 10px;
+    background: #fff;
 }
 
+/* Style individual messages */
+.message {
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: #e4e6eb;
+    margin-bottom: 10px;
+    width: fit-content;
+    max-width: 70%;
+}
+
+/* Style the input container */
+#input-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Style the message input */
 #message-input {
-    width: 70%;
-    padding: 5px;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin-right: 10px;
+    outline: none;
 }
 
-#send-button {
-    width: 25%;
-    padding: 5px;
+/* Style the send and upload buttons */
+#send-button, #file-button {
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background: #1877f2;
+    color: white;
+    cursor: pointer;
 }
 
-.message-translation {
-    color: gray;
-    font-size: 12px;
-    margin-top: 5px;
+#send-button:hover, #file-button:hover {
+    background: #145dbf;
 }
+
+/* Style the file link */
+.file-link {
+    display: block;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: #e4e6eb;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #1877f2;
+}
+
+

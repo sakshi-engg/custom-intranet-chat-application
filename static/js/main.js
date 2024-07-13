@@ -1,79 +1,45 @@
 const socket = io();
 
+// Handle send button click event
 document.getElementById('send-button').onclick = function() {
     const message = document.getElementById('message-input').value;
     socket.send(message);
     document.getElementById('message-input').value = '';
 };
 
-document.getElementById('translate-button').onclick = function() {
-    const message = document.getElementById('message-input').value;
-    translateMessage(message);
-};
-
-document.getElementById('toggle-voice').onclick = function() {
-    if (!isRecording) {
-        startRecording();
-    } else {
-        stopRecording();
+// Handle file input change event
+document.getElementById('file-input').onchange = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            socket.emit('file', { 
+                file: e.target.result, 
+                fileName: file.name 
+            });
+        };
+        reader.readAsDataURL(file);
     }
 };
 
-function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
-            mediaRecorder.ondataavailable = handleDataAvailable;
-            mediaRecorder.start();
-            toggleVoiceButton.textContent = 'Stop Recording';
-            isRecording = true;
-        })
-        .catch(error => console.error('Error accessing microphone:', error));
-}
-
-function handleDataAvailable(event) {
-    if (event.data.size > 0) {
-        recordedChunks.push(event.data);
-    }
-}
-
-function stopRecording() {
-    mediaRecorder.stop();
-    toggleVoiceButton.textContent = 'Start Recording';
-    isRecording = false;
-
-    const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
-    const audioUrl = URL.createObjectURL(audioBlob);
-    sendVoiceMessage(audioUrl);
-    recordedChunks = [];
-}
-
-function sendVoiceMessage(audioUrl) {
-    const audioElement = document.createElement('audio');
-    audioElement.src = audioUrl;
-    audioElement.controls = true;
-    const messageContainer = document.getElementById('messages');
-    messageContainer.appendChild(audioElement);
-
-    // Send voice message to server (optional)
-    // socket.send(audioUrl);
-}
-
+// Handle incoming text messages
 socket.on('message', function(msg) {
     const messageContainer = document.getElementById('messages');
     const messageElement = document.createElement('div');
     messageElement.textContent = msg;
+    messageElement.className = 'message'; // Apply message class for styling
     messageContainer.appendChild(messageElement);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 });
 
-socket.on('translation', function(data) {
-    appendTranslatedMessage(data.message, data.translated);
+// Handle incoming file uploads
+socket.on('file', function(data) {
+    const messageContainer = document.getElementById('messages');
+    const fileElement = document.createElement('a');
+    fileElement.href = data.file;
+    fileElement.download = data.fileName;
+    fileElement.textContent = `Download ${data.fileName}`;
+    fileElement.className = 'file-link'; // Apply file-link class for styling
+    messageContainer.appendChild(fileElement);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
 });
-
-function appendTranslatedMessage(original, translated) {
-    const messageElement = document.createElement('div');
-    messageElement.innerHTML = `<strong>Original:</strong> ${original}<br><strong>Translated:</strong> ${translated}`;
-    const translatedMessages = document.getElementById('translated-messages');
-    translatedMessages.appendChild(messageElement);
-}
